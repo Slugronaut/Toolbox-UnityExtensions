@@ -1,0 +1,18 @@
+{
+  "name": "com.postegames.unityextensions",
+  "version": "1.0.0",
+  "displayName": "PEGLIB - Unity Extensions",
+  "description": "Several libs, classes, visualizers, and extension methods for Unity and its editor.",
+  "unity": "2022.2",
+  "dependencies": {
+    "com.postegames.typehelper": ""
+  },
+  "keywords": [
+    "extension"
+  ],
+  "author": {
+    "name": "Sluggy",
+    "email": "jcsluggy@gmail.com",
+    "url": "http:/postegames.com"
+  }
+}

@@ -1,0 +1,19 @@
+{
+    "name": "com.postegames.unityextensions.editor",
+    "rootNamespace": "Toolbox.Editor",
+    "references": [
+        "GUID:320e6532ec885b142a3fb20a1602bf4f",
+        "GUID:777455037b3e6dd47a832372b9042dd6"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
