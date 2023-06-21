@@ -6,6 +6,8 @@
 
 using System;
 using UnityEngine;
+using System.Collections.Generic;
+using System.Linq;
 
 #if UNITY_EDITOR
 using UnityEditor;
@@ -331,10 +333,323 @@ public class EnumMaskPropertyDrawer : PropertyDrawer
         return elemVal.Equals(DoNotOperator(Convert.ChangeType(0, enumUnderlyingType), enumUnderlyingType));
     }
 }
+
+
+/// <summary>
+/// Special thanks to chat-gippity for saving me the time writing this bullshit.
+/// </summary>
+[CustomPropertyDrawer(typeof(UlongBitmaskEnumAttribute))]
+public class UlongBitmaskEnumDrawer : PropertyDrawer
+{
+    private static bool showFoldout = false;
+    private bool[] bitValues;
+    string[] _SortedEnumNames;
+
+    Type _FieldType;
+    Type FieldType
+    {
+        get
+        {
+            if(_FieldType == null)
+            {
+                UlongBitmaskEnumAttribute bitmaskAttribute = (UlongBitmaskEnumAttribute)attribute;
+                _FieldType = bitmaskAttribute.EnumType;
+            }
+
+            return _FieldType;
+        }
+    }
+
+    /*
+    string[] EnumNames
+    {
+        get
+        {
+            if (_SortedEnumNames == null)
+            {
+                UlongBitmaskEnumAttribute bitmaskAttribute = (UlongBitmaskEnumAttribute)attribute;
+                _SortedEnumNames = SortEnumNames(bitmaskAttribute.enumNames);
+            }
+            return _SortedEnumNames;
+        }
+    }
+
+    private string[] SortEnumNames(string[] enumNames)
+    {
+        if (!FieldType.IsEnum)
+        {
+            Debug.LogError("Type provided must be an enum.");
+            return enumNames;
+        }
+
+        ulong[] enumValues = new ulong[enumNames.Length];
+        for (int i = 0; i < enumNames.Length; i++)
+        {
+            enumValues[i] = Convert.ToUInt64(Enum.Parse(FieldType, enumNames[i]));
+        }
+
+        Array.Sort(enumValues, enumNames);
+        return enumNames;
+    }
+    */
+
+    string[] EnumNames
+    {
+        get
+        {
+            _SortedEnumNames = null;
+            if (_SortedEnumNames == null)
+            {
+                UlongBitmaskEnumAttribute bitmaskAttribute = (UlongBitmaskEnumAttribute)attribute;
+                _SortedEnumNames = new string[bitmaskAttribute.enumNames.Length];
+                bitmaskAttribute.enumNames.CopyTo(_SortedEnumNames, 0);
+            }
+            return _SortedEnumNames;
+        }
+    }
+
+    public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
+    {
+        if (bitValues == null)
+        {
+            bitValues = new bool[EnumNames.Length];
+            UpdateBitValues((ulong)property.longValue);
+        }
+
+        EditorGUI.BeginProperty(position, label, property);
+
+        position = EditorGUI.PrefixLabel(position, label);
+
+        showFoldout = EditorGUI.Foldout(new Rect(position.x, position.y, position.width, EditorGUIUtility.singleLineHeight), showFoldout, label);
+        position.y += EditorGUIUtility.singleLineHeight;
+
+        if (showFoldout)
+        {
+            float lineHeight = EditorGUIUtility.singleLineHeight;
+            Rect checkboxPosition = new(position.x, position.y, position.width, lineHeight);
+
+            for (int i = 0; i < EnumNames.Length; i++)
+            {
+                bitValues[i] = EditorGUI.Toggle(checkboxPosition, EnumNames[i], bitValues[i]);
+                checkboxPosition.y += lineHeight;
+
+                if ((i + 1) % 10 == 0)
+                {
+                    DrawSeparator(ref checkboxPosition);
+                }
+            }
+
+            long newBitmask = UpdateBitmaskValue((ulong)property.longValue);
+            property.longValue = (long)newBitmask;
+        }
+
+        EditorGUI.EndProperty();
+    }
+
+    public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
+    {
+        float height = EditorGUIUtility.singleLineHeight;
+
+        if (showFoldout)
+        {
+            int lineCount = EnumNames.Length;
+            int separatorCount = Mathf.CeilToInt(lineCount / 10f) - 1;
+            height += EditorGUIUtility.singleLineHeight * (lineCount + separatorCount);
+        }
+
+        return height;
+    }
+
+    private void UpdateBitValues(ulong bitmask)
+    {
+        for (int i = 0; i < EnumNames.Length; i++)
+        {
+            ulong bitValue = 1UL << i;
+            bitValues[i] = (bitmask & bitValue) == bitValue;
+        }
+    }
+
+    private long UpdateBitmaskValue(ulong originalBitmask)
+    {
+        long newBitmask = 0;
+
+        for (int i = 0; i < EnumNames.Length; i++)
+        {
+            if (bitValues[i])
+            {
+                newBitmask |= 1L << i;
+            }
+        }
+
+        return newBitmask;
+    }
+
+    private void DrawSeparator(ref Rect position)
+    {
+        float separatorHeight = 1f;
+        position.y += separatorHeight;
+        EditorGUI.DrawRect(position, Color.gray);
+        position.y += separatorHeight;
+    }
+}
+
+
+/// <summary>
+/// 
+/// </summary>
+[CustomPropertyDrawer(typeof(BitMaskAttribute))]
+public class BitMaskPropertyDrawer : PropertyDrawer
+{
+    private const int CheckboxWidth = 15;
+    private const int CheckboxHeight = 15;
+    private const int Spacing = 2;
+    private const int HighlightInterval = 10;
+    private readonly Color HighlightColor = new (0.8f, 0.8f, 1f); // Custom highlight color (light blue)
+
+    BitMaskAttribute _BitMaskAttr;
+    BitMaskAttribute BitMaskAttr
+    {
+        get
+        {
+            if (_BitMaskAttr == null)
+                _BitMaskAttr = (BitMaskAttribute)attribute;
+            return _BitMaskAttr;
+        }
+    }
+
+    public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
+    {
+        EditorGUI.BeginProperty(position, label, property);
+
+        // Ensure that the property is of type ulong
+        if (property.propertyType == SerializedPropertyType.Integer)
+        {
+            ulong bitmask = (ulong)property.longValue;
+
+            EditorGUI.BeginChangeCheck();
+
+            Rect checkboxPosition = new Rect(position.x, position.y + EditorGUIUtility.singleLineHeight, CheckboxWidth, CheckboxHeight);
+            int headerIndex = 0;
+            // Draw checkboxes for each bit of the bitmask
+            for (int i = 0; i < 64; i++)
+            {
+                bool value = (bitmask & (1UL << i)) != 0;
+
+                // Check if the current toggle should be highlighted
+                bool isHighlighted = i % HighlightInterval == 0 || i == 0;
+
+                // Store the current GUI color to reset it later
+                Color originalColor = GUI.backgroundColor;
+
+                // Apply the highlight color if necessary
+                if (isHighlighted)
+                {
+                    //GUI.backgroundColor = HighlightColor;
+                    GUI.color = HighlightColor;
+                    GUI.contentColor = HighlightColor;
+                    EditorGUI.LabelField(checkboxPosition, "");
+                    checkboxPosition.y += CheckboxHeight + Spacing;
+
+                    var headerRect = checkboxPosition;
+                    headerRect.width = 300;
+                    EditorGUI.LabelField(headerRect, BitMaskAttr.GetHeader(headerIndex++));
+                    checkboxPosition.y += CheckboxHeight + Spacing;
+                    GUI.color = originalColor;
+                    GUI.contentColor = originalColor;
+                    continue;
+                }
+
+                EditorGUI.BeginChangeCheck();
+                value = EditorGUI.Toggle(checkboxPosition, new GUIContent(BitMaskAttr.GetLabel(i)), value);
+                if (EditorGUI.EndChangeCheck())
+                {
+                    bitmask = value ? bitmask | (1UL << i) : bitmask & ~(1UL << i);
+                }
+
+                // Reset the GUI color back to the original color
+                //GUI.backgroundColor = originalColor;
+                GUI.color = originalColor;
+                GUI.contentColor = originalColor;
+                checkboxPosition.y += CheckboxHeight + Spacing;
+            }
+
+            if (EditorGUI.EndChangeCheck())
+            {
+                // Update the property value if any checkboxes are changed
+                property.longValue = (long)bitmask;
+            }
+        }
+        else
+        {
+            EditorGUI.LabelField(position, label.text, "Use BitMask attribute with ulong.");
+        }
+
+        EditorGUI.EndProperty();
+    }
+
+    public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
+    {
+        int ExtraLines = ((64 / 10) + 1) * 2;
+        return base.GetPropertyHeight(property, label) + ((ExtraLines + 64) * (CheckboxHeight + Spacing));
+    }
+}
+
 #endif
+
+
 
 [System.AttributeUsage(System.AttributeTargets.Field, AllowMultiple = false)]
 public class EnumMaskAttribute : PropertyAttribute
 {
 
+}
+
+
+[System.AttributeUsage(System.AttributeTargets.Field, AllowMultiple = false)]
+public class UlongBitmaskEnumAttribute : PropertyAttribute
+{
+    public string[] enumNames;
+    public Type EnumType;
+
+    public UlongBitmaskEnumAttribute(Type enumType)
+    {
+        if (!enumType.IsEnum)
+        {
+            Debug.LogError("BitmaskEnumAttribute only supports Enum types.");
+            return;
+        }
+
+        EnumType = enumType;
+        enumNames = Enum.GetNames(enumType);
+    }
+}
+
+
+[System.AttributeUsage(System.AttributeTargets.Field, AllowMultiple = false)]
+public class BitMaskAttribute : PropertyAttribute
+{
+    string[] Labels;
+    string[] Headers;
+
+    public BitMaskAttribute(string[] labels, string[] headers)
+    {
+        Labels = labels;
+        Headers = headers;
+    }
+
+    public string GetLabel(int i)
+    {
+        if (i < 0 || i >= Labels.Length)
+            return string.Empty;
+
+        return Labels[i];
+    }
+
+    public string GetHeader(int i)
+    {
+        if (i < 0 || i >= Headers.Length)
+            return string.Empty;
+
+        return Headers[i];
+    }
 }
