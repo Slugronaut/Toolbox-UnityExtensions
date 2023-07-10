@@ -5,7 +5,8 @@
   "description": "Several libs, classes, visualizers, and extension methods for Unity and its editor.",
   "unity": "2022.2",
   "dependencies": {
-    "com.postegames.typehelper": ""
+    "com.postegames.typehelper": "",
+    "com.postegames.mathutils": ""
   },
   "keywords": [
     "extension"
