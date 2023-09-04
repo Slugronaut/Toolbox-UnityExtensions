@@ -3,7 +3,7 @@ using UnityEditor;
 using System.IO;
 
 
-namespace Toolbox.ToolboxEditor
+namespace Peg.ToolboxEditor
 {
     public static class ScriptableObjectUtility
     {

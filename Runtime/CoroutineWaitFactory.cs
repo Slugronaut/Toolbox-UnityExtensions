@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 
 
-namespace Toolbox
+namespace Peg
 {
     /// <summary>
     /// Creates and caches a pool of <see cref="UnityEngine.WaitForSeconds" /> objects to avoid unecessary garbage when using corroutines.

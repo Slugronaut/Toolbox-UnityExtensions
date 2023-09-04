@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
 using System.Linq;
-using Toolbox;
+using Peg;
 
-namespace Toolbox.ToolboxEditor
+namespace Peg.ToolboxEditor
 {
     /*
     /// <summary>

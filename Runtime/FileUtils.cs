@@ -3,7 +3,7 @@ using System.IO;
 using System.Threading;
 using UnityEngine;
 
-namespace Toolbox
+namespace Peg
 {
 	public static class FileUtils
 	{

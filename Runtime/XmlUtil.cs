@@ -4,7 +4,7 @@ using System.IO;
 using System.Text;
 
 
-namespace Toolbox
+namespace Peg
 {
 	public static class XmlUtil
 	{

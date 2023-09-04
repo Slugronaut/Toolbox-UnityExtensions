@@ -12,7 +12,7 @@ using System.Collections.Generic;
 using System.Reflection;
 using System.IO;
 
-namespace Toolbox.ToolboxEditor
+namespace Peg.ToolboxEditor
 {
     /// <summary>
     /// Flag for marking a path as provide a full OS-level path or a shortned relative path within the project itself.

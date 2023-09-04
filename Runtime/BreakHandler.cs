@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 
-namespace Toolbox
+namespace Peg
 {
     /// <summary>
     /// Can be invoked to force the Editor to pause.

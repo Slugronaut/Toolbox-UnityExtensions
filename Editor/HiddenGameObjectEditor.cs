@@ -4,7 +4,7 @@ using UnityEditor;
 using UnityEngine;
 
 
-namespace Toolbox.ToolboxEditor
+namespace Peg.ToolboxEditor
 {
     /// <summary>
     /// Utility for revealing hidden GameObjects in the scene.

@@ -3,7 +3,7 @@ using System.Reflection;
 using System;
 using System.Text;
 
-namespace Toolbox
+namespace Peg
 {
     public static class Reflectinator
     {

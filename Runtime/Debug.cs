@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Toolbox
+namespace Peg
 {
     /// <summary>
     /// Utility class with several additional debug drawing methods not found in unity.

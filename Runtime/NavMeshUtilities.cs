@@ -1,9 +1,9 @@
-﻿using Toolbox.Math;
+﻿using Peg.Lib;
 using UnityEngine;
 using UnityEngine.AI;
 
-namespace Toolbox
-{ 
+namespace Peg
+{
     /// <summary>
     /// Simple utilities class for Unity's built-in NavMesh.
     /// </summary>
@@ -93,7 +93,7 @@ namespace Toolbox
                 Debug.DrawRay(randomPoint, Vector3.up, Color.green, 3.0f);
                 if (NavMesh.SamplePosition(randomPoint, out NavMeshHit hit, sampleSize, areaMask))
                 {
-                    if (Math.MathUtils.IsInViewport(cam, hit.position, xSafe, ySafe))
+                    if (MathUtils.IsInViewport(cam, hit.position, xSafe, ySafe))
                     {
                         result = hit.position;
                         return true;
@@ -128,7 +128,7 @@ namespace Toolbox
                 Debug.DrawRay(randomPoint, Vector3.up, Color.green, 3.0f);
                 if (NavMesh.SamplePosition(randomPoint, out NavMeshHit hit, sampleSize, areaMask))
                 {
-                    if (Math.MathUtils.IsInViewport(cam, hit.position, xSafe, ySafe))
+                    if (MathUtils.IsInViewport(cam, hit.position, xSafe, ySafe))
                     {
                         result = hit.position;
                         return true;

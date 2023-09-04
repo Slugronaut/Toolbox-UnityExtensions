@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 
 
-namespace Toolbox
+namespace Peg
 {
     /// <summary>
     /// Utility component that can be used in the editor to

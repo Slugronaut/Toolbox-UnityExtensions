@@ -5,7 +5,7 @@ using Sirenix.Serialization;
 using System.IO;
 using UnityEngine.Assertions;
 
-namespace Toolbox
+namespace Peg
 {
     /// <summary>
     /// Utilities for handling serialization of objects.
