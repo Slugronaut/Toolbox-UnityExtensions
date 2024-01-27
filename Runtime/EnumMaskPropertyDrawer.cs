@@ -11,7 +11,7 @@ using System.Linq;
 
 #if UNITY_EDITOR
 using UnityEditor;
-[CustomPropertyDrawer(typeof(EnumMaskAttribute))]
+[CustomPropertyDrawer(typeof(EnumBitMaskAttribute))]
 public class EnumMaskPropertyDrawer : PropertyDrawer
 {
     bool foldoutOpen = false;
@@ -599,7 +599,7 @@ public class BitMaskPropertyDrawer : PropertyDrawer
 
 
 [System.AttributeUsage(System.AttributeTargets.Field, AllowMultiple = false)]
-public class EnumMaskAttribute : PropertyAttribute
+public class EnumBitMaskAttribute : PropertyAttribute
 {
 
 }
